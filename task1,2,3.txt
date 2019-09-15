@@ -1,0 +1,106 @@
+Task1
+*********************Reverse lines in file using while loop****************************
+
+#!/bin/bash
+count=1
+var1=$(cat $1 | wc -l)
+while [ $var1 -gt 0 ]
+do
+tail -$count $1 | head -1 >> revfile
+var1=`expr $var1 - 1`
+count=`expr $count + 1`
+done
+cat revfile
+
+
+
+task2
+************ check disc space whether it is more then 10% or not, if it is send notification*************
+
+#!/bin/bash
+dspace=$(df / | tail -1 | awk -F " " '{print $5}' | cut -d "%" -f1)
+if [ $dspace -gt 10 ]
+then
+echo "disk space is $dspace% at: "
+date
+echo "disk space is $dspace% at: " >> discCheck
+date >> discCheck
+echo "disk space is greater then 10% "
+else
+echo "disk space is: $dspace%"
+echo " disk space is below 10%"
+fi
+
+**add this file in crontab to check disc space at reglar intervel**
+
+
+
+task3
+*****************remove except recent 5 files in a directory*************** 
+
+#!/bin/bash
+count=0
+echo ll /recentfiles -lt | find /home/ec2-user/recentfiles -type f > rfile
+lc=$(cat rfile | wc -l)
+if [ $lc -gt 0 ]
+then
+        while read line
+        do
+        count=`expr $count + 1`
+        if [ $count -gt 5 ]
+                then
+        echo "$count:Recent files deleted:  $line"
+        find $line -type f | xargs rm -rf
+        fi
+        done < rfile
+fi
+
+
+o/p
+
+6:Recent files deleted:  /home/ec2-user/recentfiles/t6
+7:Recent files deleted:  /home/ec2-user/recentfiles/t9
+8:Recent files deleted:  /home/ec2-user/recentfiles/t10
+9:Recent files deleted:  /home/ec2-user/recentfiles/t12
+10:Recent files deleted:  /home/ec2-user/recentfiles/t103
+
+
+**case program**
+
+#!/bin/bash
+echo -e " \n Select number from below list:"
+echo -e "1)search word\n 2)Create link\n 3)find file\n 4)create file\n 5)exit\n"
+read san1
+
+case $san1 in
+1)
+echo -e "Enter the word to search "
+read word
+grep -R "$word" *
+;;
+2)
+echo -e "enter the path\n"
+read path
+echo -e "enter the link name\n"
+read link1
+ln -s $path/ $link1
+;;
+3)
+echo -e "Enter the file name to find"
+read findfile1
+find /home/ -type f -name $findfile1
+;;
+4)
+echo -e "enter the file name to create"
+read file1
+touch $file1
+echo -e "file created\n"
+;;
+5)
+exit
+ ;;
+*)
+ echo " invalid input"
+;;
+esac
+
